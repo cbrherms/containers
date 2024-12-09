@@ -4,7 +4,7 @@ ARG TARGETPLATFORM
 ARG VERSION
 ARG CHANNEL
 
-RUN apk add --no-cache ca-certificates mysql-client=${VERSION} bash
+RUN apk add --no-cache ca-certificates mysql-client=${VERSION} mariadb-connector-c bash
 
 COPY entrypoint.sh /entrypoint.sh
 
