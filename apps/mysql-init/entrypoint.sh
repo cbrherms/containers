@@ -20,7 +20,7 @@ fi
 
 # These env are for the psql CLI
 export MYSQL_HOST="${INIT_MYSQL_HOST}"
-export USER="${INIT_MYSQL_SUPER_USER}"
+export MYSQL_USER="${INIT_MYSQL_SUPER_USER}"
 export MYSQL_PWD="${INIT_MYSQL_SUPER_PASS}"
 
 # Check if SSL verification should be disabled
@@ -31,24 +31,24 @@ else
 fi
 
 user_exists=$(\
-    user_exists=$(mariadb ${SSL_OPTION} -e "SELECT EXISTS(SELECT 1 FROM mysql.user WHERE user = '${INIT_MYSQL_USER}');")
+    user_exists=$(mariadb ${SSL_OPTION} -u ${MYSQL_USER} -e "SELECT EXISTS(SELECT 1 FROM mysql.user WHERE user = '${INIT_MYSQL_USER}');")
 )
 
 if [[ -z "${user_exists}" ]]; then
     printf "\e[1;32m%-6s\e[m\n" "Create User ${INIT_MYSQL_USER} ..."
-    mariadb ${SSL_OPTION} -e "CREATE USER IF NOT EXISTS '${INIT_MYSQL_USER}'@'localhost' IDENTIFIED BY '${INIT_MYSQL_PASS}';"
-    mariadb ${SSL_OPTION} -e "CREATE USER IF NOT EXISTS '${INIT_MYSQL_USER}'@'%' IDENTIFIED BY '${INIT_MYSQL_PASS}';"
+    mariadb ${SSL_OPTION} -u ${MYSQL_USER} -e "CREATE USER IF NOT EXISTS '${INIT_MYSQL_USER}'@'localhost' IDENTIFIED BY '${INIT_MYSQL_PASS}';"
+    mariadb ${SSL_OPTION} -u ${MYSQL_USER} -e "CREATE USER IF NOT EXISTS '${INIT_MYSQL_USER}'@'%' IDENTIFIED BY '${INIT_MYSQL_PASS}';"
 else
     printf "\e[1;32m%-6s\e[m\n" "Update password for user ${INIT_MYSQL_USER} ..."
-    mariadb ${SSL_OPTION} -e "ALTER USER '${INIT_MYSQL_USER}'@'localhost' IDENTIFIED BY '${INIT_MYSQL_PASS}';"
-    mariadb ${SSL_OPTION} -e "ALTER USER '${INIT_MYSQL_USER}'@'%' IDENTIFIED BY '${INIT_MYSQL_PASS}';"
+    mariadb ${SSL_OPTION} -u ${MYSQL_USER} -e "ALTER USER '${INIT_MYSQL_USER}'@'localhost' IDENTIFIED BY '${INIT_MYSQL_PASS}';"
+    mariadb ${SSL_OPTION} -u ${MYSQL_USER} -e "ALTER USER '${INIT_MYSQL_USER}'@'%' IDENTIFIED BY '${INIT_MYSQL_PASS}';"
 fi
 
 for dbname in ${INIT_MYSQL_DBNAME}; do
     printf "\e[1;32m%-6s\e[m\n" "Create Database ${dbname} ..."
-    mariadb ${SSL_OPTION} -e "CREATE DATABASE IF NOT EXISTS ${dbname};"
+    mariadb ${SSL_OPTION} -u ${MYSQL_USER} -e "CREATE DATABASE IF NOT EXISTS ${dbname};"
 
     printf "\e[1;32m%-6s\e[m\n" "Update User Privileges on Database ${dbname} ..."
-    mariadb ${SSL_OPTION} -e "GRANT ALL PRIVILEGES ON ${dbname}.* TO '${INIT_MYSQL_USER}'@'localhost'; FLUSH PRIVILEGES;"
-    mariadb ${SSL_OPTION} -e "GRANT ALL PRIVILEGES ON ${dbname}.* TO '${INIT_MYSQL_USER}'@'%'; FLUSH PRIVILEGES;"
+    mariadb ${SSL_OPTION} -u ${MYSQL_USER} -e "GRANT ALL PRIVILEGES ON ${dbname}.* TO '${INIT_MYSQL_USER}'@'localhost'; FLUSH PRIVILEGES;"
+    mariadb ${SSL_OPTION} -u ${MYSQL_USER} -e "GRANT ALL PRIVILEGES ON ${dbname}.* TO '${INIT_MYSQL_USER}'@'%'; FLUSH PRIVILEGES;"
 done
