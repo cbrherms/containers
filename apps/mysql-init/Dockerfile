@@ -5,6 +5,7 @@ ARG VERSION
 ARG CHANNEL
 
 RUN apk add --no-cache ca-certificates mysql-client=${VERSION} mariadb-connector-c bash
+# mariadb-connector-c is needed for caching_sha2_password plugin
 
 COPY entrypoint.sh /entrypoint.sh
 
