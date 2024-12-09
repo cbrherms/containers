@@ -23,6 +23,13 @@ export MYSQL_HOST="${INIT_MYSQL_HOST}"
 export USER="${INIT_MYSQL_SUPER_USER}"
 export MYSQL_PWD="${INIT_MYSQL_SUPER_PASS}"
 
+# Check if SSL verification should be disabled
+if [[ "${DISABLE_SSL_VERIFICATION}" == "true" ]]; then
+    export MYSQL_SSL_MODE=DISABLED
+else
+    export MYSQL_SSL_MODE=PREFERRED
+fi
+
 user_exists=$(\
     user_exists=$(mysql -e "SELECT EXISTS(SELECT 1 FROM mysql.user WHERE user = '${INIT_MYSQL_USER}');")
 )
