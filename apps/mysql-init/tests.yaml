@@ -1,0 +1,6 @@
+---
+schemaVersion: "2.0.0"
+fileExistenceTests:
+  - name: mariadb
+    path: /usr/bin/mariadb
+    shouldExist: true
