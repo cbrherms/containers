@@ -1,0 +1,12 @@
+---
+schemaVersion: "2.0.0"
+fileExistenceTests:
+  - name: autodl
+    path: /app/autodl.sh
+    shouldExist: true
+  - name: autospend
+    path: /app/autospend.sh
+    shouldExist: true
+  - name: seedbox-api
+    path: /app/seedbox-api.sh
+    shouldExist: true
