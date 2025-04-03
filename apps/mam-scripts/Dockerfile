@@ -19,15 +19,21 @@ RUN apk add --no-cache \
         jq \
         trurl \
         tzdata \
-    && \
-    apk add --no-cache --virtual=.build-deps \
+    && rm -rf /root/.cache /root/.cargo /tmp/*
+
+ADD https://api.github.com/repos/cbrherms/MAM-Scripts/git/refs/heads/"${VERSION}" /tmp/version.json
+
+RUN apk add --no-cache --virtual=.build-deps \
         git \
     && \
-    git clone --single-branch --branch "${VERSION}" https://github.com/cbrherms/MAM-Scripts.git . \
+    git clone  --single-branch --branch "${VERSION}" https://github.com/cbrherms/MAM-Scripts.git . \
     && \
-    chown -R root:root /app && chmod -R 755 /app \
-    && apk del --purge .build-deps \
-    && rm -rf /root/.cache /root/.cargo /tmp/*
+    rm -f /tmp/version.json \
+    && \
+    apk del --purge .build-deps \
+    && \
+    chown -R root:root /app && chmod -R 755 /app
+
 
 COPY ./entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
