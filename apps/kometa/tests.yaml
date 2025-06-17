@@ -1,0 +1,11 @@
+---
+schemaVersion: "2.0.0"
+fileExistenceTests:
+  - name: 1Password CLI
+    path: /usr/local/bin/op
+    shouldExist: true
+commandTests:
+  - name: Python YAML
+    command: "python3"
+    args: ["-c", "import yaml; print('YAML module loaded')"]
+    expectedOutput: ["YAML module loaded"]
