@@ -4,9 +4,20 @@ ARG TARGETPLATFORM
 ARG VERSION
 ARG CHANNEL
 
-RUN apk add --no-cache ca-certificates mysql-client=${VERSION} mariadb-connector-c bash
+USER root
+
+RUN \
+    apk add --no-cache \
+    bash \
+    ca-certificates \
+    catatonit \
+    mysql-client~"${VERSION}" \
+    mariadb-connector-c
 # mariadb-connector-c is needed for caching_sha2_password plugin
 
 COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
 
-CMD ["/entrypoint.sh"]
+USER nobody:nogroup
+
+ENTRYPOINT ["/usr/bin/catatonit", "--", "/entrypoint.sh"]
