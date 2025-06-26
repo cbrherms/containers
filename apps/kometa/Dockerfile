@@ -21,6 +21,11 @@ RUN echo "Downloading 1Password CLI v${OP_CLI_VERSION} for architecture ${TARGET
     chmod +x /usr/local/bin/op && \
     rm -f /tmp/op.zip
 
-USER nobody:nogroup
+RUN mkdir -p /config && \
+    groupadd kometa --gid=1000 && \
+    useradd -g kometa --uid=1000 -d /config kometa && \
+    chown -R kometa:kometa /config
+
+USER kometa
 
 LABEL org.opencontainers.image.source="https://github.com/kometateam/kometa"
