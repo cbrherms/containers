@@ -1,6 +1,6 @@
 # renovate: datasource=docker depName=python
-ARG PYTHON_VERSION=3.11
-FROM python:${PYTHON_VERSION} as builder
+ARG BASE_PYTHON_VERSION=3.11
+FROM python:${BASE_PYTHON_VERSION} as builder
 
 ARG VERSION
 
@@ -14,8 +14,9 @@ RUN git checkout "tags/${VERSION}" -b "build-${VERSION}"
 RUN pip install --no-cache-dir -r requirements.txt
 
 
-FROM python:${PYTHON_VERSION}-slim
+FROM python:${BASE_PYTHON_VERSION}-slim
 
+ARG BASE_PYTHON_VERSION
 ARG TARGETPLATFORM
 ARG VERSION
 ARG CHANNEL
@@ -27,7 +28,7 @@ RUN addgroup --system app && adduser --system --ingroup app app
 
 WORKDIR /app
 
-COPY --from=builder /usr/local/lib/python${PYTHON_VERSION}/site-packages /usr/local/lib/python${PYTHON_VERSION}/site-packages
+COPY --from=builder /usr/local/lib/python${BASE_PYTHON_VERSION}/site-packages /usr/local/lib/python${BASE_PYTHON_VERSION}/site-packages
 COPY --from=builder /app/src ./src
 
 RUN chown -R app:app /app
