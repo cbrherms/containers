@@ -1,5 +1,5 @@
 # renovate: datasource=docker depName=python
-ARG BASE_PYTHON_VERSION=3.11
+ARG BASE_PYTHON_VERSION=3.13
 FROM python:${BASE_PYTHON_VERSION} as builder
 
 ARG VERSION
