@@ -1,4 +1,6 @@
-FROM python:3.11 as builder
+# renovate: datasource=docker depName=python
+ARG PYTHON_VERSION=3.11
+FROM python:${PYTHON_VERSION} as builder
 
 ARG VERSION
 
@@ -12,7 +14,7 @@ RUN git checkout "tags/${VERSION}" -b "build-${VERSION}"
 RUN pip install --no-cache-dir -r requirements.txt
 
 
-FROM python:3.11-slim
+FROM python:${PYTHON_VERSION}-slim
 
 ARG TARGETPLATFORM
 ARG VERSION
@@ -25,7 +27,7 @@ RUN addgroup --system app && adduser --system --ingroup app app
 
 WORKDIR /app
 
-COPY --from=builder /usr/local/lib/python3.11/site-packages /usr/local/lib/python3.11/site-packages
+COPY --from=builder /usr/local/lib/python${PYTHON_VERSION}/site-packages /usr/local/lib/python${PYTHON_VERSION}/site-packages
 COPY --from=builder /app/src ./src
 
 RUN chown -R app:app /app
