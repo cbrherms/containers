@@ -1,0 +1,20 @@
+---
+schemaVersion: "2.0.0"
+fileExistenceTests:
+  - name: "App source directory"
+    path: "/app/src"
+    shouldExist: true
+commandTests:
+  - name: "Check for plexapi"
+    command: "python"
+    args: ["-c", "import plexapi"]
+  - name: "Check for sonarr-py"
+    command: "python"
+    args: ["-c", "import sonarr"]
+  - name: "Check for lxml"
+    command: "python"
+    args: ["-c", "import lxml"]
+metadataTest:
+  envVars:
+    - key: "IS_DOCKER"
+      value: "true"
