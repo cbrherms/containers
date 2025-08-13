@@ -1,4 +1,4 @@
 ---
 # renovate: datasource=docker depName=kometateam/kometa versioning=semver-coerced
-version: v2.2.0
+version: v2.2.1
 name: kometa
