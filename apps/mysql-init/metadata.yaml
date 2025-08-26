@@ -1,4 +1,4 @@
 ---
 # renovate: datasource=repology depName=alpine_3_22/mariadb versioning=loose
-version: 11.4.5-r2
+version: 11.4.8-r0
 name: mysql-init
