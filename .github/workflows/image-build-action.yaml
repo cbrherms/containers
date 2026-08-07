@@ -244,7 +244,7 @@ jobs:
           subject-digest: ${{ needs.release.outputs.digest }}
 
       - name: Upload SARIF Report
-        uses: github/codeql-action/upload-sarif@e60ea984bd3baa95954f2856bcf24f9eaba46637 # v3.37.5
+        uses: github/codeql-action/upload-sarif@c4dd10e44af883a891fe31ced449bcb4a6728b9b # v3.37.6
         with:
           sarif_file: ${{ steps.scan.outputs.sarif }}
 
