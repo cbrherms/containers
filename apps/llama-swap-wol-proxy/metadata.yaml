@@ -1,0 +1,3 @@
+# renovate: datasource=github-releases depName=mostlygeek/llama-swap versioning=semver-coerced
+version: v276
+name: llama-swap-wol-proxy

@@ -1,0 +1,55 @@
+schemaVersion: "2.0.0"
+fileExistenceTests:
+  - name: wol-proxy binary
+    path: /wol-proxy
+    shouldExist: true
+  - name: environment entrypoint
+    path: /entrypoint.sh
+    shouldExist: true
+commandTests:
+  - name: upstream CLI options
+    command: /entrypoint.sh
+    args: ["-h"]
+    expectedError:
+      - "-mac"
+      - "-upstream"
+      - "-listen"
+      - "-log"
+      - "-timeout"
+      - "-api-key"
+      - "-require-confirm"
+    exitCode: 0
+  - name: MAC environment setting
+    command: /entrypoint.sh
+    envVars:
+      - key: LS_WOL_MAC
+        value: invalid
+      - key: LS_WOL_UPSTREAM
+        value: http://127.0.0.1:8080
+    expectedError:
+      - "invalid MAC address"
+  - name: CLI argument overrides environment setting
+    command: /entrypoint.sh
+    args: ["-mac", "BA:DC:0F:FE:E0:00"]
+    envVars:
+      - key: LS_WOL_MAC
+        value: invalid
+      - key: LS_WOL_UPSTREAM
+        value: invalid-url
+    expectedError:
+      - "error parsing upstream url"
+  - name: timeout environment setting
+    command: /entrypoint.sh
+    envVars:
+      - key: LS_WOL_MAC
+        value: BA:DC:0F:FE:E0:00
+      - key: LS_WOL_UPSTREAM
+        value: http://127.0.0.1:8080
+      - key: LS_WOL_TIMEOUT
+        value: "0"
+    expectedError:
+      - "timeout must be greater than 0"
+metadataTest:
+  exposedPorts: ["8080"]
+  entrypoint: ["/entrypoint.sh"]
+  user: "65532:65532"
