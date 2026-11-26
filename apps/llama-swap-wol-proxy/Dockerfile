@@ -16,7 +16,7 @@ RUN mkdir -p /out && \
     CGO_ENABLED=0 GOOS="${TARGETOS}" GOARCH="${TARGETARCH}" \
     go build -trimpath -ldflags="-s -w" -o /out/wol-proxy ./cmd/wol-proxy
 
-FROM alpine:3.22
+FROM alpine:3.24
 
 COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
 COPY --from=builder /out/wol-proxy /wol-proxy
