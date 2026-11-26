@@ -4,3 +4,69 @@ fileExistenceTests:
   - name: mariadb
     path: /usr/bin/mariadb
     shouldExist: true
+commandTests:
+  - name: missing configuration is reported
+    command: /entrypoint.sh
+    exitCode: 1
+    expectedOutput:
+      - "Invalid configuration - missing a required environment variable"
+      - "INIT_MYSQL_HOST: unset"
+  - name: MariaDB client runs
+    command: mariadb
+    args: ["--version"]
+    expectedOutput: ["mariadb"]
+  - name: creates a user when none exists
+    command: /entrypoint.sh
+    envVars:
+      - key: INIT_MYSQL_HOST
+        value: db
+      - key: INIT_MYSQL_SUPER_PASS
+        value: admin-password
+      - key: INIT_MYSQL_USER
+        value: app
+      - key: INIT_MYSQL_PASS
+        value: app-password
+      - key: INIT_MYSQL_DBNAME
+        value: appdb
+      - key: MOCK_USER_EXISTS
+        value: "0"
+      - key: "BASH_FUNC_mariadb%%"
+        value: |
+          () {
+            case "$*" in
+              *"SELECT EXISTS"*) printf '%s\n' "$MOCK_USER_EXISTS" ;;
+              *"CREATE USER"*) printf '%s\n' "MOCK_CREATE_USER" ;;
+            esac
+          }
+    expectedOutput:
+      - "Create User app"
+      - "MOCK_CREATE_USER"
+  - name: updates password when user already exists
+    command: /entrypoint.sh
+    envVars:
+      - key: INIT_MYSQL_HOST
+        value: db
+      - key: INIT_MYSQL_SUPER_PASS
+        value: admin-password
+      - key: INIT_MYSQL_USER
+        value: app
+      - key: INIT_MYSQL_PASS
+        value: app-password
+      - key: INIT_MYSQL_DBNAME
+        value: appdb
+      - key: MOCK_USER_EXISTS
+        value: "1"
+      - key: "BASH_FUNC_mariadb%%"
+        value: |
+          () {
+            case "$*" in
+              *"SELECT EXISTS"*) printf '%s\n' "$MOCK_USER_EXISTS" ;;
+              *"ALTER USER"*) printf '%s\n' "MOCK_ALTER_USER" ;;
+            esac
+          }
+    expectedOutput:
+      - "Update password for user app"
+      - "MOCK_ALTER_USER"
+metadataTest:
+  entrypoint: ["/usr/bin/catatonit", "--", "/entrypoint.sh"]
+  user: "nobody:nogroup"

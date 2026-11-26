@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+set -e
 
 # This is most commonly set to the user 'root'
 export INIT_MYSQL_SUPER_USER=${INIT_MYSQL_SUPER_USER:-root}
@@ -30,19 +31,25 @@ else
     SSL_OPTION=""
 fi
 
-user_exists=$(\
-    user_exists=$(mariadb ${SSL_OPTION} -u ${MYSQL_USER} -e "SELECT EXISTS(SELECT 1 FROM mysql.user WHERE user = '${INIT_MYSQL_USER}');")
-)
+user_exists=$(mariadb ${SSL_OPTION} -u ${MYSQL_USER} --skip-column-names \
+    -e "SELECT EXISTS(SELECT 1 FROM mysql.user WHERE user = '${INIT_MYSQL_USER}');")
 
-if [[ -z "${user_exists}" ]]; then
-    printf "\e[1;32m%-6s\e[m\n" "Create User ${INIT_MYSQL_USER} ..."
-    mariadb ${SSL_OPTION} -u ${MYSQL_USER} -e "CREATE USER IF NOT EXISTS '${INIT_MYSQL_USER}'@'localhost' IDENTIFIED BY '${INIT_MYSQL_PASS}';"
-    mariadb ${SSL_OPTION} -u ${MYSQL_USER} -e "CREATE USER IF NOT EXISTS '${INIT_MYSQL_USER}'@'%' IDENTIFIED BY '${INIT_MYSQL_PASS}';"
-else
-    printf "\e[1;32m%-6s\e[m\n" "Update password for user ${INIT_MYSQL_USER} ..."
-    mariadb ${SSL_OPTION} -u ${MYSQL_USER} -e "ALTER USER '${INIT_MYSQL_USER}'@'localhost' IDENTIFIED BY '${INIT_MYSQL_PASS}';"
-    mariadb ${SSL_OPTION} -u ${MYSQL_USER} -e "ALTER USER '${INIT_MYSQL_USER}'@'%' IDENTIFIED BY '${INIT_MYSQL_PASS}';"
-fi
+case "${user_exists}" in
+    0)
+        printf "\e[1;32m%-6s\e[m\n" "Create User ${INIT_MYSQL_USER} ..."
+        mariadb ${SSL_OPTION} -u ${MYSQL_USER} -e "CREATE USER IF NOT EXISTS '${INIT_MYSQL_USER}'@'localhost' IDENTIFIED BY '${INIT_MYSQL_PASS}';"
+        mariadb ${SSL_OPTION} -u ${MYSQL_USER} -e "CREATE USER IF NOT EXISTS '${INIT_MYSQL_USER}'@'%' IDENTIFIED BY '${INIT_MYSQL_PASS}';"
+        ;;
+    1)
+        printf "\e[1;32m%-6s\e[m\n" "Update password for user ${INIT_MYSQL_USER} ..."
+        mariadb ${SSL_OPTION} -u ${MYSQL_USER} -e "ALTER USER '${INIT_MYSQL_USER}'@'localhost' IDENTIFIED BY '${INIT_MYSQL_PASS}';"
+        mariadb ${SSL_OPTION} -u ${MYSQL_USER} -e "ALTER USER '${INIT_MYSQL_USER}'@'%' IDENTIFIED BY '${INIT_MYSQL_PASS}';"
+        ;;
+    *)
+        printf 'Unexpected user-existence query result: %s\n' "${user_exists}" >&2
+        exit 1
+        ;;
+esac
 
 for dbname in ${INIT_MYSQL_DBNAME}; do
     printf "\e[1;32m%-6s\e[m\n" "Create Database ${dbname} ..."
