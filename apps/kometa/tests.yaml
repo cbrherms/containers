@@ -5,7 +5,13 @@ fileExistenceTests:
     path: /usr/local/bin/op
     shouldExist: true
 commandTests:
+  - name: 1Password CLI runs
+    command: op
+    args: ["--version"]
+    expectedOutput: ["2.31.1"]
   - name: Python YAML
     command: "python3"
     args: ["-c", "import yaml; print('YAML module loaded')"]
     expectedOutput: ["YAML module loaded"]
+metadataTest:
+  user: "kometa"

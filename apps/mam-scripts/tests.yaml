@@ -10,3 +10,18 @@ fileExistenceTests:
   - name: seedbox-api
     path: /app/seedbox-api.sh
     shouldExist: true
+commandTests:
+  - name: SCRIPT_NAME is required
+    command: /entrypoint.sh
+    exitCode: 1
+    expectedOutput:
+      - "Error: SCRIPT_NAME not set."
+metadataTest:
+  entrypoint: ["/usr/bin/catatonit", "--", "/entrypoint.sh"]
+  user: "nobody:nogroup"
+  volumes: ["/config"]
+  envVars:
+    - key: UMASK
+      value: "0002"
+    - key: TZ
+      value: "Etc/UTC"

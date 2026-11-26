@@ -15,6 +15,8 @@ commandTests:
     command: "python"
     args: ["-c", "import lxml"]
 metadataTest:
+  user: "app"
+  cmd: ["python", "-m", "src"]
   envVars:
     - key: "IS_DOCKER"
       value: "true"
